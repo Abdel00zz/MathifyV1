@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 const translationCache: { [key: string]: any } = {};
@@ -15,17 +16,18 @@ const flattenObject = (obj: any, prefix: string = ''): Record<string, string> =>
 };
 
 export function useI18n(language: 'en' | 'fr') {
-  const [rawLocale, setRawLocale] = useState<any | null>(null);
+  const [rawLocale, setRawLocale] = useState<any>(() => translationCache[language] || null);
 
   const flatLocale = useMemo(() => {
     return rawLocale ? flattenObject(rawLocale) : null;
   }, [rawLocale]);
 
   useEffect(() => {
-    let isMounted = true;
     const loadTranslations = async () => {
       if (translationCache[language]) {
-        setRawLocale(translationCache[language]);
+        if (rawLocale !== translationCache[language]) {
+          setRawLocale(translationCache[language]);
+        }
         return;
       }
       try {
@@ -34,20 +36,14 @@ export function useI18n(language: 'en' | 'fr') {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        if (isMounted) {
-            translationCache[language] = data;
-            setRawLocale(data);
-        }
+        translationCache[language] = data;
+        setRawLocale(data);
       } catch (error) {
         console.error(`Could not load translation file for language: ${language}`, error);
       }
     };
     loadTranslations();
-
-    return () => {
-        isMounted = false;
-    }
-  }, [language]);
+  }, [language, rawLocale]);
 
   const t = useCallback((path: string, replacements?: Record<string, string | number>): string => {
     if (!flatLocale) {
