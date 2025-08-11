@@ -52,7 +52,9 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, tot
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">EXERCICE {index + 1}</span>
                     <h4 className="font-display font-bold text-lg text-slate-800 dark:text-slate-100">
                         <MathJax hideUntilTypeset="first" inline key={exercise.title}>
-                           <span dangerouslySetInnerHTML={{ __html: exercise.title }} />
+                           {/* Render title as text content for safety and proper MathJax processing. */}
+                           {/* The title is not expected to be HTML, unlike the exercise content. */}
+                           {exercise.title}
                         </MathJax>
                     </h4>
                     </div>

@@ -23,8 +23,7 @@ const enTranslations = {
     "addFromImage": "Add from image",
     "export": "Export",
     "noExercises": "This document is empty.",
-    "addFirstExercise": "Add your first exercise manually or from an image.",
-    "dragAndDrop": "Drag and drop to reorder exercises."
+    "addFirstExercise": "Add your first exercise manually or from an image."
   },
   "modals": {
     "newDocument": {
@@ -88,7 +87,7 @@ const enTranslations = {
     "help": {
       "title": "Help & About",
       "editingTitle": "Editing Content",
-      "editingText": "You can edit document titles by clicking on them. Exercises can be modified using the 'Edit' button. To reorder exercises, simply drag and drop them using the handle on the left.",
+      "editingText": "You can edit document titles by clicking on them. Exercises can be modified using the 'Edit' button. To reorder exercises, use the up and down arrow buttons on each exercise card.",
       "syntaxTitle": "Content Syntax",
       "syntaxText": "The exercise content field accepts a mix of HTML for formatting and LaTeX for mathematical notation.",
       "inlineMath": "For inline formulas, wrap your LaTeX with \\(...\\). Example:",
@@ -139,7 +138,9 @@ const enTranslations = {
   "tooltips": {
     "settings": "Settings",
     "help": "Help",
-    "actions": "Actions"
+    "actions": "Actions",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 };
 
@@ -164,8 +165,7 @@ const frTranslations = {
     "addFromImage": "Ajouter depuis une image",
     "export": "Exporter",
     "noExercises": "Ce document est vide.",
-    "addFirstExercise": "Ajoutez votre premier exercice manuellement ou depuis une image.",
-    "dragAndDrop": "Glissez-déposez pour réorganiser les exercices."
+    "addFirstExercise": "Ajoutez votre premier exercice manuellement ou depuis une image."
   },
   "modals": {
     "newDocument": {
@@ -229,7 +229,7 @@ const frTranslations = {
     "help": {
       "title": "Aide & À propos",
       "editingTitle": "Modifier le Contenu",
-      "editingText": "Vous pouvez modifier les titres des documents en cliquant dessus. Les exercices peuvent être modifiés via le bouton 'Modifier'. Pour réorganiser les exercices, glissez-déposez-les à l'aide de la poignée à gauche.",
+      "editingText": "Vous pouvez modifier les titres des documents en cliquant dessus. Les exercices peuvent être modifiés via le bouton 'Modifier'. Pour réorganiser les exercices, utilisez les flèches haut et bas sur chaque carte d'exercice.",
       "syntaxTitle": "Syntaxe du Contenu",
       "syntaxText": "Le champ de contenu des exercices accepte un mélange de HTML pour la mise en forme et de LaTeX pour les notations mathématiques.",
       "inlineMath": "Pour les formules en ligne, entourez votre code LaTeX avec \\(...\\). Exemple :",
@@ -280,7 +280,9 @@ const frTranslations = {
   "tooltips": {
     "settings": "Paramètres",
     "help": "Aide",
-    "actions": "Actions"
+    "actions": "Actions",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas"
   }
 };
 

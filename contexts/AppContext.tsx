@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useCallback, ReactNode, useContext } from 'react';
 import { AppSettings, Document, Exercise } from '../types';
 import { DOCS_STORAGE_KEY, SETTINGS_STORAGE_KEY } from '../constants';
@@ -145,7 +146,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addExercise = useCallback((docId: string, exercise: Omit<Exercise, 'id'>) => {
     const newExercise: Exercise = {
       ...exercise,
-      id: `ex_${Date.now()}`,
+      id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     };
     setDocuments(prev =>
       prev.map(doc =>
