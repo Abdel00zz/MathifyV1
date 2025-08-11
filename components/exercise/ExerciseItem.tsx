@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Exercise } from '../../types';
 import { useDocuments } from '../../hooks/useDocuments';
@@ -9,7 +8,6 @@ import ConfirmModal from '../modals/ConfirmModal';
 import { GripVertical, Pencil, Trash2 } from 'lucide-react';
 import StarRating from '../ui/StarRating';
 import MathRenderer from '../ui/MathRenderer';
-import { MathJax } from 'better-react-mathjax';
 
 interface ExerciseItemProps {
   docId: string;
@@ -49,9 +47,7 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, onD
                     <div className="flex items-baseline gap-3 flex-wrap">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">EXERCICE {index + 1}</span>
                     <h4 className="font-display font-bold text-lg text-slate-800 dark:text-slate-100">
-                        <MathJax hideUntilTypeset="first" inline>
-                           <span dangerouslySetInnerHTML={{ __html: exercise.title }} />
-                        </MathJax>
+                        <MathRenderer content={exercise.title} inline />
                     </h4>
                     </div>
                     <StarRating rating={exercise.difficulty} size={16} />
