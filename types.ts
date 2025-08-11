@@ -23,6 +23,7 @@ export interface AppSettings {
   theme: 'light' | 'dark' | 'system';
   teacherName?: string;
   schoolId?: string;
+  apiKey?: string;
 }
 
 export interface ExportOptions {

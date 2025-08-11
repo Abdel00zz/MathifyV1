@@ -11,6 +11,8 @@ export const useSettings = () => {
     settings: context.settings,
     updateSettings: context.updateSettings,
     t: context.t,
-    isMobile: context.isMobile
+    isMobile: context.isMobile,
+    isApiKeyValid: context.isApiKeyValid,
+    verifyApiKey: context.verifyApiKey,
   };
 };

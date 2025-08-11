@@ -5,13 +5,16 @@ import { DOCS_STORAGE_KEY, SETTINGS_STORAGE_KEY } from '../constants';
 import { useMobile } from '../hooks/useMobile';
 import { useI18n } from '../hooks/useI18n';
 import { ToastContext } from './ToastContext';
+import { verifyGeminiApiKey } from '../services/geminiService';
 
 interface AppContextType {
   documents: Document[];
   settings: AppSettings;
   isMobile: boolean;
   recentlyDuplicatedId: string | null;
+  isApiKeyValid: boolean;
   t: (key: string, replacements?: Record<string, string | number>) => string;
+  verifyApiKey: (key: string) => Promise<boolean>;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   addDocument: (doc: Omit<Document, 'id' | 'exercises' | 'date'>) => Document;
   updateDocument: (docId: string, updates: Partial<Document>) => void;
@@ -45,14 +48,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     theme: 'system',
     teacherName: '',
     schoolId: '',
+    apiKey: '',
   };
 
   const [documents, setDocuments] = useState<Document[]>(() => getInitialState<Document[]>(DOCS_STORAGE_KEY, []));
   const [settings, setSettings] = useState<AppSettings>(() => getInitialState<AppSettings>(SETTINGS_STORAGE_KEY, defaultSettings));
   const [recentlyDuplicatedId, setRecentlyDuplicatedId] = useState<string | null>(null);
+  const [isApiKeyValid, setIsApiKeyValid] = useState(false);
 
   const isMobile = useMobile();
   const { t } = useI18n(settings.language);
+
+  const verifyApiKey = useCallback(async (key: string): Promise<boolean> => {
+    const isValid = await verifyGeminiApiKey(key);
+    setIsApiKeyValid(isValid);
+    return isValid;
+  }, []);
+
+  useEffect(() => {
+    if (settings.apiKey) {
+      verifyApiKey(settings.apiKey);
+    } else {
+      setIsApiKeyValid(false);
+    }
+  }, [settings.apiKey, verifyApiKey]);
 
   useEffect(() => {
     try {
@@ -99,8 +118,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const deleteDocument = useCallback((docId: string) => {
     const docTitle = documents.find(d => d.id === docId)?.title || 'Document';
     setDocuments(prev => prev.filter(doc => doc.id !== docId));
-    toastContext?.addToast(t('toasts.documentDeleted', { title: docTitle }), 'success');
-  }, [documents, toastContext, t]);
+    toastContext?.addToast(`"${docTitle}" deleted.`, 'success');
+  }, [documents, toastContext]);
   
   const duplicateDocument = useCallback((docId: string) => {
     const docToDuplicate = documents.find(d => d.id === docId);
@@ -163,8 +182,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           : doc
       )
     );
-    toastContext?.addToast(t('toasts.exerciseDeleted'), 'success');
-  }, [toastContext, t]);
+    toastContext?.addToast('Exercise deleted.', 'success');
+  }, [toastContext]);
 
   const reorderExercises = useCallback((docId: string, startIndex: number, endIndex: number) => {
     setDocuments(prev =>
@@ -214,14 +233,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (doc.id === docId) {
           // Only show toast if there were actually unsaved changes
           if (!doc.lastSaved || (doc.lastModified && doc.lastModified > doc.lastSaved)) {
-             toastContext?.addToast(t('toasts.documentSaved', { title: doc.title }), 'success');
+             toastContext?.addToast(`"${doc.title}" saved.`, 'success');
           }
           return { ...doc, lastSaved: doc.lastModified };
         }
         return doc;
       })
     );
-  }, [toastContext, t]);
+  }, [toastContext]);
 
   const value = {
     documents,
@@ -229,6 +248,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     isMobile,
     t,
     recentlyDuplicatedId,
+    isApiKeyValid,
+    verifyApiKey,
     updateSettings,
     addDocument,
     updateDocument,

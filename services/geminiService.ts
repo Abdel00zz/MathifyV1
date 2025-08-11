@@ -32,13 +32,13 @@ export interface GeminiAnalysisOptions {
 }
 
 export const analyzeImageWithGemini = async (
+  apiKey: string,
   base64Image: string,
   mimeType: string,
   options: GeminiAnalysisOptions
 ): Promise<GeminiExerciseResponse> => {
-  const apiKey = process.env.API_KEY;
   if (!apiKey) {
-      throw new Error("API Key not found. Please set the API_KEY environment variable.");
+      throw new Error("API Key is missing.");
   }
   
   const ai = new GoogleGenAI({ apiKey });
@@ -93,3 +93,26 @@ export const analyzeImageWithGemini = async (
     throw new Error("An unknown error occurred while calling the Gemini API.");
   }
 };
+
+
+export const verifyGeminiApiKey = async (apiKey: string): Promise<boolean> => {
+    if (!apiKey) return false;
+    try {
+        const ai = new GoogleGenAI({ apiKey });
+        // Make a lightweight, non-generative call to verify the key.
+        // A simple prompt with minimal output is a good way to test connectivity and authentication.
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: 'ping',
+            config: {
+                maxOutputTokens: 1,
+                thinkingConfig: { thinkingBudget: 0 }
+            }
+        });
+        // Check if we got a valid response structure
+        return !!response.text;
+    } catch(e) {
+        console.error("API Key verification failed:", e);
+        return false;
+    }
+}

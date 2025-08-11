@@ -30,11 +30,11 @@ const Dashboard: React.FC = () => {
             } else if (typeof importedData === 'object' && importedData !== null) {
               importDocuments([importedData as Document]);
             }
-             addToast(t('toasts.importSuccess'), 'success');
+             addToast('Documents imported successfully!', 'success');
           }
         } catch (error) {
           console.error("Failed to parse imported JSON", error);
-          addToast(t('toasts.importError'), 'error');
+          addToast("Error: Invalid JSON file.", 'error');
         }
       };
       reader.readAsText(file);

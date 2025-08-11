@@ -40,7 +40,7 @@ interface ImageUploadModalProps {
 
 const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, docId }) => {
   const { addExercise } = useDocuments();
-  const { t } = useSettings();
+  const { t, settings, isApiKeyValid } = useSettings();
   const [files, setFiles] = useState<ImageFile[]>([]);
   const [reviseText, setReviseText] = useState(true);
   const [boldKeywords, setBoldKeywords] = useState(true);
@@ -65,6 +65,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
   }, [resetState, onClose]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (!settings.apiKey) return; // Prevent drop if API key is not set
     const newFiles: ImageFile[] = acceptedFiles.map(file => ({
       id: `file_${Date.now()}_${Math.random()}`,
       file,
@@ -72,12 +73,13 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
       status: 'waiting',
     }));
     setFiles(prev => [...prev, ...newFiles]);
-  }, []);
+  }, [settings.apiKey]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/*': ['.jpeg', '.png', '.jpg', '.gif', '.webp'] },
     multiple: true,
+    disabled: !settings.apiKey
   });
   
   const handleRemoveFile = useCallback((id: string) => {
@@ -89,12 +91,16 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
   }, []);
   
   const handleAnalysis = useCallback(async () => {
+    if (!isApiKeyValid || !settings.apiKey) {
+        addToast(t('modals.imageUpload.apiKeyMissing'), 'error');
+        return;
+    }
     for (const imageFile of files) {
         if (imageFile.status === 'waiting') {
             setFiles(prev => prev.map(f => f.id === imageFile.id ? { ...f, status: 'analyzing' } : f));
             try {
                 const base64Image = await fileToBase64(imageFile.file);
-                const analysisResult = await analyzeImageWithGemini(base64Image, imageFile.file.type, { reviseText, boldKeywords });
+                const analysisResult = await analyzeImageWithGemini(settings.apiKey, base64Image, imageFile.file.type, { reviseText, boldKeywords });
                 setFiles(prev => prev.map(f => f.id === imageFile.id ? { ...f, status: 'success', result: analysisResult } : f));
             } catch (e) {
                 const errorMessage = e instanceof Error ? e.message : t('modals.imageUpload.error');
@@ -103,22 +109,25 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
             }
         }
     }
-  }, [files, t, addToast, reviseText, boldKeywords]);
+  }, [files, t, addToast, reviseText, boldKeywords, settings.apiKey, isApiKeyValid]);
 
   const handleAddExercises = useCallback(() => {
     const successfulExercises = files.filter(f => f.status === 'success' && f.result).map(f => f.result!);
     successfulExercises.forEach(ex => addExercise(docId, ex));
     if(successfulExercises.length > 0) {
-        addToast(t('toasts.exercisesAdded', { count: successfulExercises.length }), 'success');
+        addToast(`${successfulExercises.length} exercise(s) added successfully!`, 'success');
         handleClose();
     }
-  }, [files, addExercise, docId, handleClose, addToast, t]);
+  }, [files, addExercise, docId, handleClose, addToast]);
 
   const waitingCount = useMemo(() => files.filter(f => f.status === 'waiting').length, [files]);
   const successCount = useMemo(() => files.filter(f => f.status === 'success').length, [files]);
   const isAnalyzing = useMemo(() => files.some(f => f.status === 'analyzing'), [files]);
 
   const renderFooter = () => {
+    if (!settings.apiKey) {
+      return <Button variant="secondary" onClick={handleClose}>{t('actions.close')}</Button>;
+    }
     if (files.length === 0) {
       return <Button variant="secondary" onClick={handleClose}>{t('actions.close')}</Button>;
     }
@@ -139,7 +148,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
                         {t('modals.imageUpload.addExercises', { count: successCount })}
                     </Button>
                 ) : (
-                    <Button variant="primary" onClick={handleAnalysis} disabled={isAnalyzing || waitingCount === 0}>
+                    <Button variant="primary" onClick={handleAnalysis} disabled={isAnalyzing || waitingCount === 0 || !isApiKeyValid}>
                         {isAnalyzing ? <Loader size={16} className="mr-2 animate-spin"/> : <FileX2 size={16} className="mr-2"/>}
                         {t('modals.imageUpload.analyze_count', { count: waitingCount })}
                     </Button>
@@ -152,7 +161,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={t('modals.imageUpload.title')} size="3xl" footer={renderFooter()}>
       <div className="min-h-[40vh] max-h-[70vh] flex flex-col space-y-4">
-        {files.length > 0 && (
+        {files.length > 0 && settings.apiKey && (
           <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 flex-shrink-0">
             <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">{t('modals.imageUpload.optionsTitle')}</h4>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -161,7 +170,13 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
             </div>
           </div>
         )}
-        {files.length === 0 ? (
+        {!settings.apiKey ? (
+            <div className="flex-grow p-10 flex flex-col items-center justify-center text-center bg-amber-50 dark:bg-amber-900/10 border-2 border-dashed border-amber-400 dark:border-amber-600 rounded-lg">
+                <AlertTriangle size={48} className="text-amber-500" />
+                <h3 className="mt-4 text-lg font-semibold text-amber-900 dark:text-amber-200">{t('modals.imageUpload.apiKeyNeededTitle')}</h3>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{t('modals.imageUpload.apiKeyNeededDescription')}</p>
+            </div>
+        ) : files.length === 0 ? (
            <div
               {...getRootProps()}
               className={`flex-grow p-10 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors flex flex-col items-center justify-center ${

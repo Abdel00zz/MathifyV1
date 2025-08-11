@@ -112,9 +112,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, document }) 
       }
     } else {
       setIsPrinting(false);
-      addToast(t('toasts.popupError'), 'error');
+      addToast("Could not open print window. Check your browser's popup blocker.", 'error');
     }
-  }, [generatedHtml, addToast, t]);
+  }, [generatedHtml, addToast]);
 
   const handleDownload = useCallback(() => {
     const blob = new Blob([generatedHtml], { type: 'text/html' });

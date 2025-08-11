@@ -79,7 +79,7 @@ const getStyles = (options: ExportOptions) => {
       .content { 
         column-count: ${options.columns}; 
         column-gap: 1.5cm;
-        ${options.columns > 1 ? 'column-rule: 1px solid #94a3b8; /* slate-400 */' : ''}
+        ${options.columns > 1 ? 'column-rule: 1px solid #d1d5db; /* slate-300 */' : ''}
       }
       .exercise {
         /* Removed 'break-inside: avoid' to allow exercises to flow across columns and pages */

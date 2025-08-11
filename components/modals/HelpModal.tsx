@@ -58,7 +58,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         </HelpSection>
 
         <HelpSection icon={<Mail size={24} />} title={t('modals.help.contact')}>
-            <p>{t('modals.help.contactText')}</p>
+            <p>For support, please visit our GitHub repository or contact the development team.</p>
         </HelpSection>
         
       </div>

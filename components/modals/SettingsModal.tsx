@@ -5,33 +5,78 @@ import { useSettings } from '../../hooks/useSettings';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
-import { Save, X, Sun, Moon, Laptop } from 'lucide-react';
+import { Save, X, Sun, Moon, Laptop, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+type VerificationStatus = 'idle' | 'verifying' | 'valid' | 'invalid';
+
+const VerificationStatusIndicator: React.FC<{status: VerificationStatus, t: (key: string) => string}> = ({ status, t }) => {
+    if (status === 'idle') return null;
+
+    const statusMap = {
+        verifying: {
+            icon: <Loader2 size={16} className="animate-spin" />,
+            text: t('modals.settings.verification.verifying'),
+            color: 'text-slate-500 dark:text-slate-400'
+        },
+        valid: {
+            icon: <CheckCircle size={16} />,
+            text: t('modals.settings.verification.valid'),
+            color: 'text-green-600 dark:text-green-500'
+        },
+        invalid: {
+            icon: <AlertCircle size={16} />,
+            text: t('modals.settings.verification.invalid'),
+            color: 'text-red-600 dark:text-red-500'
+        }
+    };
+
+    const currentStatus = statusMap[status];
+
+    return (
+        <div className={`flex items-center gap-2 text-sm font-medium ${currentStatus.color}`}>
+            {currentStatus.icon}
+            <span>{currentStatus.text}</span>
+        </div>
+    );
+};
+
+
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, t } = useSettings();
-  const [localSettings, setLocalSettings] = useState<Omit<AppSettings, 'apiKey'>>(settings);
+  const { settings, updateSettings, t, verifyApiKey } = useSettings();
+  const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
   const [isSaving, setIsSaving] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('idle');
+
 
   useEffect(() => {
     if (isOpen) {
-      const { ...rest } = settings;
-      setLocalSettings(rest);
+      setLocalSettings(settings);
+      setVerificationStatus('idle');
     }
   }, [isOpen, settings]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setLocalSettings(prev => ({ ...prev, [name]: value }));
+    if (name === 'apiKey') {
+        setVerificationStatus('idle');
+    }
+    setLocalSettings(prev => ({ ...prev, [name]: value as any }));
   }, []);
 
   const handleThemeChange = useCallback((theme: 'light' | 'dark' | 'system') => {
     setLocalSettings(prev => ({ ...prev, theme }));
   }, []);
+  
+  const handleVerify = async () => {
+    setVerificationStatus('verifying');
+    const isValid = await verifyApiKey(localSettings.apiKey || '');
+    setVerificationStatus(isValid ? 'valid' : 'invalid');
+  };
 
   const handleSave = useCallback(() => {
     setIsSaving(true);
@@ -70,9 +115,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             ))}
           </div>
         </div>
-        <div className="text-sm p-3 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
-          The Google Gemini API Key is now configured securely via an environment variable and cannot be changed here.
+
+        <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <Input
+            label={t('modals.settings.geminiApiKey')}
+            name="apiKey"
+            type="password"
+            value={localSettings.apiKey || ''}
+            onChange={handleChange}
+            placeholder={t('modals.settings.geminiApiKeyPlaceholder')}
+          />
+          <div className="flex items-center justify-between h-8">
+            <VerificationStatusIndicator status={verificationStatus} t={t} />
+            <Button variant="secondary" size="sm" onClick={handleVerify} isLoading={verificationStatus === 'verifying'}>
+              {t('modals.settings.verifyConnection')}
+            </Button>
+          </div>
         </div>
+        
         <Input
           label={t('modals.settings.teacherName')}
           name="teacherName"
