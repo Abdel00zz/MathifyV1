@@ -89,7 +89,8 @@
       "aiText": "Use the 'Add from Image' button to let our AI analyze and transcribe your exercises automatically. In the upload window, you can choose to have the AI revise the text or bold key terms for you.",
       "about": "About Mathify",
       "aboutText": "Mathify is an innovative educational platform for math teachers and students. It uses AI to analyze images of math exercises, automatically extracting content, structure, and LaTeX formulas to streamline the creation of structured mathematical documents.",
-      "contact": "Contact & Support"
+      "contact": "Contact & Support",
+      "contactText": "For support, please visit our GitHub repository or contact the development team."
     },
     "confirm": {
       "title": "Are you sure?",
@@ -129,5 +130,14 @@
     "settings": "Settings",
     "help": "Help",
     "actions": "Actions"
+  },
+  "toasts": {
+    "documentDeleted": "\"{title}\" has been deleted.",
+    "exerciseDeleted": "Exercise has been deleted.",
+    "documentSaved": "\"{title}\" has been saved.",
+    "importSuccess": "Documents imported successfully!",
+    "importError": "Error: Invalid JSON file.",
+    "exercisesAdded": "{count} exercise(s) added successfully!",
+    "popupError": "Could not open print window. Check your browser's popup blocker."
   }
 }

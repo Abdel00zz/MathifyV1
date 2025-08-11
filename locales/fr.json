@@ -89,7 +89,8 @@
       "aiText": "Utilisez le bouton 'Ajouter depuis une image' pour que notre IA analyse et transcrive automatiquement vos exercices. Dans la fenêtre d'import, vous pouvez choisir que l'IA révise le texte ou mette les mots-clés en gras pour vous.",
       "about": "À propos de Mathify",
       "aboutText": "Mathify est une plateforme éducative innovante pour les enseignants et étudiants en mathématiques. Elle utilise l'IA pour analyser des images d'exercices, extrayant automatiquement le contenu, la structure et les formules LaTeX pour faciliter la création de documents mathématiques.",
-      "contact": "Contact & Support"
+      "contact": "Contact & Support",
+      "contactText": "Pour obtenir de l'aide, veuillez visiter notre dépôt GitHub ou contacter l'équipe de développement."
     },
     "confirm": {
       "title": "Êtes-vous sûr ?",
@@ -129,5 +130,14 @@
     "settings": "Paramètres",
     "help": "Aide",
     "actions": "Actions"
+  },
+    "toasts": {
+    "documentDeleted": "\"{title}\" a été supprimé.",
+    "exerciseDeleted": "L'exercice a été supprimé.",
+    "documentSaved": "\"{title}\" a été enregistré.",
+    "importSuccess": "Documents importés avec succès !",
+    "importError": "Erreur : Fichier JSON invalide.",
+    "exercisesAdded": "{count} exercice(s) ajouté(s) avec succès !",
+    "popupError": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez le bloqueur de pop-ups de votre navigateur."
   }
 }

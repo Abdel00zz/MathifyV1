@@ -109,10 +109,10 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, do
     const successfulExercises = files.filter(f => f.status === 'success' && f.result).map(f => f.result!);
     successfulExercises.forEach(ex => addExercise(docId, ex));
     if(successfulExercises.length > 0) {
-        addToast(`${successfulExercises.length} exercise(s) added successfully!`, 'success');
+        addToast(t('toasts.exercisesAdded', { count: successfulExercises.length }), 'success');
         handleClose();
     }
-  }, [files, addExercise, docId, handleClose, addToast]);
+  }, [files, addExercise, docId, handleClose, addToast, t]);
 
   const waitingCount = useMemo(() => files.filter(f => f.status === 'waiting').length, [files]);
   const successCount = useMemo(() => files.filter(f => f.status === 'success').length, [files]);

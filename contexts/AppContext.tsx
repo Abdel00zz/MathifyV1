@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useCallback, ReactNode, useContext } from 'react';
 import { AppSettings, Document, Exercise } from '../types';
 import { DOCS_STORAGE_KEY, SETTINGS_STORAGE_KEY } from '../constants';
@@ -98,8 +99,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const deleteDocument = useCallback((docId: string) => {
     const docTitle = documents.find(d => d.id === docId)?.title || 'Document';
     setDocuments(prev => prev.filter(doc => doc.id !== docId));
-    toastContext?.addToast(`"${docTitle}" deleted.`, 'success');
-  }, [documents, toastContext]);
+    toastContext?.addToast(t('toasts.documentDeleted', { title: docTitle }), 'success');
+  }, [documents, toastContext, t]);
   
   const duplicateDocument = useCallback((docId: string) => {
     const docToDuplicate = documents.find(d => d.id === docId);
@@ -162,8 +163,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           : doc
       )
     );
-    toastContext?.addToast('Exercise deleted.', 'success');
-  }, [toastContext]);
+    toastContext?.addToast(t('toasts.exerciseDeleted'), 'success');
+  }, [toastContext, t]);
 
   const reorderExercises = useCallback((docId: string, startIndex: number, endIndex: number) => {
     setDocuments(prev =>
@@ -213,14 +214,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (doc.id === docId) {
           // Only show toast if there were actually unsaved changes
           if (!doc.lastSaved || (doc.lastModified && doc.lastModified > doc.lastSaved)) {
-             toastContext?.addToast(`"${doc.title}" saved.`, 'success');
+             toastContext?.addToast(t('toasts.documentSaved', { title: doc.title }), 'success');
           }
           return { ...doc, lastSaved: doc.lastModified };
         }
         return doc;
       })
     );
-  }, [toastContext]);
+  }, [toastContext, t]);
 
   const value = {
     documents,
