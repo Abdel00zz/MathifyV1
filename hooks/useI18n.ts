@@ -40,7 +40,8 @@ export function useI18n(language: 'en' | 'fr') {
           return;
         }
 
-        const response = await fetch(`./locales/${language}.json`);
+        // Use an absolute path to prevent 404 errors on nested client-side routes
+        const response = await fetch(`/locales/${language}.json`);
         if (!response.ok) {
           throw new Error(`Failed to fetch translations: ${response.status} ${response.statusText}`);
         }
