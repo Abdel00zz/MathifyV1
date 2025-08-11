@@ -1,6 +1,22 @@
 # Mathify - AI-Powered Math Document Editor
 
+![Powered by Google Gemini](https://img.shields.io/badge/Powered%20by-Google%20Gemini-4285F4?logo=google-gemini)
+![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
+![Styled with Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38B2AC?logo=tailwind-css)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 Mathify is an innovative, responsive, and highly optimized web application designed for mathematics teachers and students. It streamlines the creation, organization, and sharing of structured mathematical documents by leveraging the power of Google's Gemini AI. The AI analyzes images of math exercises, intelligently detects their language, and automatically extracts content, hierarchical structure, and LaTeX-formatted formulas, preserving the original context without translation.
+
+<!-- Add a screenshot or GIF of your application here! -->
+<!-- ![Mathify App Demo](https://path-to-your/demo.gif) -->
+
+## Table of Contents
+- [✨ Key Features](#-key-features)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [🏗️ Project Architecture](#️-project-architecture)
+- [🚀 Getting Started](#-getting-started)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ## ✨ Key Features
 
@@ -36,22 +52,22 @@ Mathify is an innovative, responsive, and highly optimized web application desig
 
 The project is structured to be modular, scalable, and maintainable.
 
-- **/src/components**: Contains all React components, organized by feature (`document`, `exercise`, `modals`) and reusability (`ui`, `layout`).
-  - **/ui**: Generic, reusable components like `Button`, `Modal`, `Input`, and `Checkbox`.
-  - **/layout**: Structural components like `Header`.
-- **/src/contexts**: `AppContext` and `ToastContext` provide global state management, avoiding prop drilling.
-- **/src/hooks**: Custom hooks encapsulate reusable logic.
+- `src/components`: Contains all React components, organized by feature (`document`, `exercise`, `modals`) and reusability (`ui`, `layout`).
+  - `ui`: Generic, reusable components like `Button`, `Modal`, `Input`, and `Checkbox`.
+  - `layout`: Structural components like `Header`.
+- `src/contexts`: `AppContext` and `ToastContext` provide global state management, avoiding prop drilling.
+- `src/hooks`: Custom hooks encapsulate reusable logic.
   - `useDocuments`: Manages all CRUD operations for documents and exercises.
   - `useSettings`: Manages user settings and preferences.
   - `useI18n`: Handles language loading and provides the translation function.
   - `useMobile`: Detects if the user is on a mobile device for responsive UI adjustments.
   - `useFocusTrap`: Ensures keyboard focus is contained within modals for accessibility.
-- **/src/services**: Isolates external communications and complex logic.
+- `src/services`: Isolates external communications and complex logic.
   - `geminiService.ts`: Handles all interactions with the Google Gemini API, including dynamic prompt construction.
   - `htmlGenerator.ts`: Creates the self-contained HTML for document exports, complete with themes and column support.
-- **/src/types**: Defines all core TypeScript types and interfaces (`Document`, `Exercise`, etc.).
-- **/src/locales**: Stores JSON files for internationalization.
-- **/src/constants.ts**: Shared constants, such as `localStorage` keys.
+- `src/types`: Defines all core TypeScript types and interfaces (`Document`, `Exercise`, etc.).
+- `src/locales`: Stores JSON files for internationalization.
+- `src/constants.ts`: Shared constants, such as `localStorage` keys.
 
 ### Core Logic Explained
 
@@ -61,39 +77,60 @@ The project is structured to be modular, scalable, and maintainable.
 
 ## 🚀 Getting Started
 
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
 ### Prerequisites
 
 - A modern web browser (Chrome, Firefox, Safari, Edge).
 - A **Google Gemini API Key**. You can obtain one from [Google AI Studio](https://makersuite.google.com/app/apikey).
 
-### Configuration
+### Installation & Setup
 
-The application requires a Google Gemini API key to function. This key must be provided as an environment variable.
-
-1.  This application is designed to be run in an environment where the `API_KEY` is securely managed. For local development, create a `.env` file in the root of your project.
-2.  Add your Gemini API Key to the `.env` file like this:
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/mathify.git
+    cd mathify
     ```
-    API_KEY=YOUR_GEMINI_API_KEY
-    ```
-    Replace `YOUR_GEMINI_API_KEY` with your actual key. The application is configured to automatically use this variable.
+    *(Replace `your-username/mathify` with the actual repository URL if it's already on GitHub)*
 
-### Running the Application
-
-1.  **Install dependencies:**
+2.  **Install dependencies:**
+    This project uses `npm` for package management.
     ```bash
     npm install
     ```
-2.  **Run in Development Mode**:
+
+3.  **Configure Environment Variables:**
+    The application requires a Google Gemini API key to function. This key must be provided as an environment variable.
+    - Create a file named `.env` in the root of your project.
+    - Add your Gemini API Key to this file:
+    ```
+    API_KEY=YOUR_GEMINI_API_KEY
+    ```
+    > **Note:** Replace `YOUR_GEMINI_API_KEY` with your actual key. The `.env` file is included in `.gitignore` to prevent you from accidentally committing your secret key.
+
+### Running the Application
+
+1.  **Run in Development Mode**:
     ```bash
     npm run dev
     ```
-    This will start the development server with hot-reloading.
+    This will start the development server with hot-reloading, usually available at `http://localhost:5173`.
 
-3.  **Build for Production**:
+2.  **Build for Production**:
     ```bash
     npm run build
     ```
-    This will create an optimized `dist` folder ready for deployment.
+    This will create an optimized `dist` folder with the static assets, ready for deployment to any web server or hosting service.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/mathify/issues).
+
+1.  **Fork** the Project.
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the Branch (`git push origin feature/AmazingFeature`).
+5.  Open a **Pull Request**.
 
 ## 📄 License
 
