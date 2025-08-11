@@ -6,9 +6,10 @@ import Dashboard from './components/document/Dashboard';
 import DocumentEditor from './components/document/DocumentEditor';
 import { useSettings } from './hooks/useSettings';
 import Spinner from './components/ui/Spinner';
+import { AlertTriangle } from 'lucide-react';
 
 function App() {
-  const { settings, isI18nLoading } = useSettings();
+  const { settings, isI18nLoading, isI18nError } = useSettings();
 
   React.useEffect(() => {
     document.documentElement.lang = settings.language;
@@ -29,6 +30,17 @@ function App() {
       </div>
     );
   }
+  
+  if (isI18nError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 text-center">
+        <AlertTriangle size={48} className="text-red-500" />
+        <h1 className="mt-4 text-2xl font-bold text-slate-800 dark:text-slate-100">Failed to Load Application</h1>
+        <p className="mt-2 text-slate-600 dark:text-slate-400">Could not load language files. Please check your network connection and try refreshing the page.</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen flex flex-col">

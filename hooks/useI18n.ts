@@ -15,9 +15,11 @@ const flattenObject = (obj: any, prefix: string = ''): Record<string, string> =>
   }, {} as Record<string, string>);
 };
 
+type LoadState = 'loading' | 'success' | 'error';
+
 export function useI18n(language: 'en' | 'fr') {
   const [rawLocale, setRawLocale] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadState, setLoadState] = useState<LoadState>('loading');
 
   const flatLocale = useMemo(() => {
     return rawLocale ? flattenObject(rawLocale) : null;
@@ -26,36 +28,45 @@ export function useI18n(language: 'en' | 'fr') {
   useEffect(() => {
     let isMounted = true;
     const loadTranslations = async () => {
-      setIsLoading(true);
+      if (!isMounted) return;
+      setLoadState('loading');
+
       try {
         if (translationCache[language]) {
-          if (isMounted) setRawLocale(translationCache[language]);
-        } else {
-          const response = await fetch(`./locales/${language}.json`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
           if (isMounted) {
-            translationCache[language] = data;
-            setRawLocale(data);
+            setRawLocale(translationCache[language]);
+            setLoadState('success');
           }
+          return;
+        }
+
+        const response = await fetch(`./locales/${language}.json`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch translations: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+
+        if (isMounted) {
+          translationCache[language] = data;
+          setRawLocale(data);
+          setLoadState('success');
         }
       } catch (error) {
         console.error(`Could not load translation file for language: ${language}`, error);
-      } finally {
-        if (isMounted) setIsLoading(false);
+        if (isMounted) {
+          setLoadState('error');
+        }
       }
     };
     loadTranslations();
 
     return () => {
-        isMounted = false;
+      isMounted = false;
     }
   }, [language]);
 
   const t = useCallback((path: string, replacements?: Record<string, string | number>): string => {
-    if (!flatLocale) {
+    if (loadState !== 'success' || !flatLocale) {
       return path;
     }
     
@@ -68,7 +79,11 @@ export function useI18n(language: 'en' | 'fr') {
     }
     
     return str;
-  }, [flatLocale]);
+  }, [flatLocale, loadState]);
 
-  return { t, isLoading };
+  return { 
+    t, 
+    isLoading: loadState === 'loading',
+    isError: loadState === 'error',
+  };
 }
