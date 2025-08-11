@@ -14,6 +14,7 @@ interface AppContextType {
   recentlyDuplicatedId: string | null;
   isApiKeyValid: boolean;
   t: (key: string, replacements?: Record<string, string | number>) => string;
+  isI18nLoading: boolean;
   verifyApiKey: (key: string) => Promise<boolean>;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   addDocument: (doc: Omit<Document, 'id' | 'exercises' | 'date'>) => Document;
@@ -56,7 +57,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
 
   const isMobile = useMobile();
-  const { t } = useI18n(settings.language);
+  const { t, isLoading: isI18nLoading } = useI18n(settings.language);
 
   const verifyApiKey = useCallback(async (key: string): Promise<boolean> => {
     const isValid = await verifyGeminiApiKey(key);
@@ -224,13 +225,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   }, []);
 
-  const value = {
+  const value: AppContextType = {
     documents,
     settings,
     isMobile,
     t,
     recentlyDuplicatedId,
     isApiKeyValid,
+    isI18nLoading,
     verifyApiKey,
     updateSettings,
     addDocument,

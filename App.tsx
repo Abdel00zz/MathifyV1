@@ -5,9 +5,10 @@ import Header from './components/layout/Header';
 import Dashboard from './components/document/Dashboard';
 import DocumentEditor from './components/document/DocumentEditor';
 import { useSettings } from './hooks/useSettings';
+import Spinner from './components/ui/Spinner';
 
 function App() {
-  const { settings } = useSettings();
+  const { settings, isI18nLoading } = useSettings();
 
   React.useEffect(() => {
     document.documentElement.lang = settings.language;
@@ -20,6 +21,14 @@ function App() {
       (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     root.classList.toggle('dark', isDark);
   }, [settings.theme]);
+
+  if (isI18nLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950">
+        <Spinner size="lg" text="Loading application..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

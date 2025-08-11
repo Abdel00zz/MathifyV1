@@ -11,6 +11,7 @@ export const useSettings = () => {
     settings: context.settings,
     updateSettings: context.updateSettings,
     t: context.t,
+    isI18nLoading: context.isI18nLoading,
     isMobile: context.isMobile,
     isApiKeyValid: context.isApiKeyValid,
     verifyApiKey: context.verifyApiKey,
