@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-// Import direct des fichiers de traduction
-const translations = {
-  en: () => import('../locales/en.json'),
-  fr: () => import('../locales/fr.json'),
-};
-
 const translationCache: { [key: string]: any } = {};
 
 const flattenObject = (obj: any, prefix: string = ''): Record<string, string> => {
@@ -20,11 +14,10 @@ const flattenObject = (obj: any, prefix: string = ''): Record<string, string> =>
   }, {} as Record<string, string>);
 };
 
-type LoadState = 'loading' | 'success' | 'error';
-
 export function useI18n(language: 'en' | 'fr') {
   const [rawLocale, setRawLocale] = useState<any | null>(null);
-  const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const flatLocale = useMemo(() => {
     return rawLocale ? flattenObject(rawLocale) : null;
@@ -33,43 +26,38 @@ export function useI18n(language: 'en' | 'fr') {
   useEffect(() => {
     let isMounted = true;
     const loadTranslations = async () => {
-      if (!isMounted) return;
-      setLoadState('loading');
-
+      setIsLoading(true);
+      setError(null);
       try {
         if (translationCache[language]) {
-          if (isMounted) {
-            setRawLocale(translationCache[language]);
-            setLoadState('success');
+          if (isMounted) setRawLocale(translationCache[language]);
+        } else {
+          const response = await fetch(`/locales/${language}.json`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch translations: ${response.status} ${response.statusText}`);
           }
-          return;
-        }
-
-        // Import dynamique du fichier de traduction
-        const translationModule = await translations[language]();
-        const data = translationModule.default;
-
-        if (isMounted) {
-          translationCache[language] = data;
-          setRawLocale(data);
-          setLoadState('success');
+          const data = await response.json();
+          if (isMounted) {
+            translationCache[language] = data;
+            setRawLocale(data);
+          }
         }
       } catch (error) {
         console.error(`Could not load translation file for language: ${language}`, error);
-        if (isMounted) {
-          setLoadState('error');
-        }
+        if (isMounted) setError(error as Error);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     };
     loadTranslations();
 
     return () => {
-      isMounted = false;
+        isMounted = false;
     }
   }, [language]);
 
   const t = useCallback((path: string, replacements?: Record<string, string | number>): string => {
-    if (loadState !== 'success' || !flatLocale) {
+    if (!flatLocale) {
       return path;
     }
     
@@ -82,11 +70,7 @@ export function useI18n(language: 'en' | 'fr') {
     }
     
     return str;
-  }, [flatLocale, loadState]);
+  }, [flatLocale]);
 
-  return { 
-    t, 
-    isLoading: loadState === 'loading',
-    isError: loadState === 'error',
-  };
+  return { t, isLoading, error };
 }

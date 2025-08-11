@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
@@ -6,14 +5,17 @@ import Dashboard from './components/document/Dashboard';
 import DocumentEditor from './components/document/DocumentEditor';
 import { useSettings } from './hooks/useSettings';
 import Spinner from './components/ui/Spinner';
-import { AlertTriangle } from 'lucide-react';
+import { WifiOff, RefreshCw } from 'lucide-react';
+import Button from './components/ui/Button';
 
 function App() {
-  const { settings, isI18nLoading, isI18nError } = useSettings();
+  const { settings, isI18nLoading, i18nError } = useSettings();
 
   React.useEffect(() => {
-    document.documentElement.lang = settings.language;
-  }, [settings.language]);
+    if (settings?.language) {
+      document.documentElement.lang = settings.language;
+    }
+  }, [settings?.language]);
   
   React.useEffect(() => {
     const root = window.document.documentElement;
@@ -30,17 +32,24 @@ function App() {
       </div>
     );
   }
-  
-  if (isI18nError) {
+
+  if (i18nError) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 text-center">
-        <AlertTriangle size={48} className="text-red-500" />
-        <h1 className="mt-4 text-2xl font-bold text-slate-800 dark:text-slate-100">Failed to Load Application</h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">Could not load language files. Please check your network connection and try refreshing the page.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 dark:bg-slate-950 text-center p-6">
+        <div className="w-16 h-16 flex items-center justify-center bg-red-100 dark:bg-red-500/10 rounded-full mb-4">
+            <WifiOff className="w-8 h-8 text-red-500 dark:text-red-400" />
+        </div>
+        <h1 className="text-2xl font-bold font-display text-red-800 dark:text-red-200">Failed to Load Application</h1>
+        <p className="mt-2 max-w-md text-red-700 dark:text-red-300">
+            Could not load language files. This can happen due to network issues or a problem with the application deployment.
+        </p>
+        <Button variant="secondary" onClick={() => window.location.reload()} className="mt-8">
+            <RefreshCw size={16} className="mr-2" />
+            Refresh Page
+        </Button>
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen flex flex-col">

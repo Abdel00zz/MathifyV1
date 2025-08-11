@@ -1,9 +1,9 @@
 import React from 'react';
 import { icons, LucideProps } from 'lucide-react';
 
-interface IconProps extends LucideProps {
+type IconProps = LucideProps & {
   name: keyof typeof icons;
-}
+};
 
 const Icon = ({ name, ...props }: IconProps): JSX.Element | null => {
   const LucideIcon = icons[name];
