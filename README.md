@@ -98,5 +98,3 @@ The application requires a Google Gemini API key to function. This key must be p
 ## 📄 License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
-#   M a t h i f y V 1  
- 

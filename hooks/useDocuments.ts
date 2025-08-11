@@ -18,5 +18,6 @@ export const useDocuments = () => {
     reorderExercises: context.reorderExercises,
     importDocuments: context.importDocuments,
     saveDocument: context.saveDocument,
+    recentlyDuplicatedId: context.recentlyDuplicatedId,
   };
 };

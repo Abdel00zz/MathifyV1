@@ -7,15 +7,13 @@ import Button from '../ui/Button';
 import NewDocumentModal from '../modals/NewDocumentModal';
 import { Document } from '../../types';
 import { Plus, Upload } from 'lucide-react';
-import { AppContext } from '../../contexts/AppContext';
 import { useToast } from '../../hooks/useToast';
 
 const Dashboard: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const { documents, importDocuments } = useDocuments();
+  const { documents, importDocuments, recentlyDuplicatedId } = useDocuments();
   const { t } = useSettings();
   const { addToast } = useToast();
-  const { recentlyDuplicatedId } = React.useContext(AppContext)!;
 
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
