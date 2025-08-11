@@ -64,18 +64,17 @@ The project is structured to be modular, scalable, and maintainable.
 ### Prerequisites
 
 - A modern web browser (Chrome, Firefox, Safari, Edge).
-- A **Google Gemini API Key**. You can obtain one from [Google AI Studio](https://makersuite.google.com/app/apikey).
+- A **Google Gemini API Key**.
 
 ### Configuration
 
-The application requires a Google Gemini API key to function. This key must be provided as an environment variable.
+The application requires a Google Gemini API key to use AI-powered features like image analysis.
 
-1.  This application is designed to be run in an environment where the `API_KEY` is securely managed. For local development, create a `.env` file in the root of your project.
-2.  Add your Gemini API Key to the `.env` file like this:
-    ```
-    API_KEY=YOUR_GEMINI_API_KEY
-    ```
-    Replace `YOUR_GEMINI_API_KEY` with your actual key. The application is configured to automatically use this variable.
+1.  Obtain an API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
+2.  Open the application and click on the **Settings** icon (cog wheel) in the header.
+3.  In the Settings modal, paste your API key into the "Google Gemini API Key" field.
+4.  Click "Verify" to ensure the key is working correctly.
+5.  Click "Save Settings". The key will be securely stored in your browser's local storage for future sessions.
 
 ### Running the Application
 
