@@ -1,5 +1,10 @@
-
 import { useState, useEffect, useCallback, useMemo } from 'react';
+
+// Import direct des fichiers de traduction
+const translations = {
+  en: () => import('../locales/en.json'),
+  fr: () => import('../locales/fr.json'),
+};
 
 const translationCache: { [key: string]: any } = {};
 
@@ -40,12 +45,9 @@ export function useI18n(language: 'en' | 'fr') {
           return;
         }
 
-        // Use an absolute path to prevent 404 errors on nested client-side routes
-        const response = await fetch(`/locales/${language}.json`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch translations: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
+        // Import dynamique du fichier de traduction
+        const translationModule = await translations[language]();
+        const data = translationModule.default;
 
         if (isMounted) {
           translationCache[language] = data;
