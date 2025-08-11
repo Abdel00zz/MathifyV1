@@ -78,7 +78,6 @@ const DocumentEditor: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <aside className="md:col-span-1 space-y-4 md:sticky md:top-24 h-fit bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
-          <h2 className="text-lg font-semibold font-display border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Actions</h2>
           <Button variant="secondary" onClick={() => setAddExerciseOpen(true)} className="w-full justify-start">
             <Plus size={16} className="mr-2"/>
             {t('documentEditor.addExercise')}
@@ -122,7 +121,7 @@ const DocumentEditor: React.FC = () => {
               {document.className} - {document.schoolYear}
             </p>
           </div>
-          <ExerciseList docId={document.id} exercises={document.exercises} />
+          <ExerciseList key={document.lastModified || document.id} docId={document.id} exercises={document.exercises} />
         </main>
       </div>
       

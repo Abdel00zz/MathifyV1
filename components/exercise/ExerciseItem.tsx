@@ -6,21 +6,21 @@ import { useSettings } from '../../hooks/useSettings';
 import Button from '../ui/Button';
 import ExerciseEditorModal from '../modals/ExerciseEditorModal';
 import ConfirmModal from '../modals/ConfirmModal';
-import { GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import StarRating from '../ui/StarRating';
 import MathRenderer from '../ui/MathRenderer';
 import { MathJax } from 'better-react-mathjax';
+import Tooltip from '../ui/Tooltip';
 
 interface ExerciseItemProps {
   docId: string;
   exercise: Exercise;
   index: number;
-  onDragStart: () => void;
-  isDragging: boolean;
+  totalExercises: number;
 }
 
-const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, onDragStart, isDragging }) => {
-  const { deleteExercise } = useDocuments();
+const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, totalExercises }) => {
+  const { deleteExercise, reorderExercises } = useDocuments();
   const { t } = useSettings();
   const [isEditorOpen, setEditorOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
@@ -30,20 +30,22 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, onD
     setDeleteOpen(false);
   }, [deleteExercise, docId, exercise.id]);
   
-  const opacityClass = isDragging ? 'opacity-30' : 'opacity-100';
+  const handleMoveUp = useCallback(() => {
+    if (index > 0) {
+      reorderExercises(docId, index, index - 1);
+    }
+  }, [docId, index, reorderExercises]);
+
+  const handleMoveDown = useCallback(() => {
+    if (index < totalExercises - 1) {
+      reorderExercises(docId, index, index + 1);
+    }
+  }, [docId, index, totalExercises, reorderExercises]);
 
   return (
     <>
-      <div className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col group transition-shadow hover:shadow-lg ${opacityClass}`}>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col group transition-shadow hover:shadow-lg">
         <div className="flex gap-4 p-6">
-            <div 
-                draggable
-                onDragStart={onDragStart}
-                className="cursor-grab text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pt-1"
-                aria-label="Drag to reorder"
-            >
-                <GripVertical size={24} />
-            </div>
             <div className="flex-grow">
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex items-baseline gap-3 flex-wrap">
@@ -71,8 +73,21 @@ const ExerciseItem: React.FC<ExerciseItemProps> = ({ docId, exercise, index, onD
                 />
             </div>
         </div>
-        <div className="border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-end gap-2">
-             <Button variant="secondary" size="sm" onClick={() => setEditorOpen(true)}>
+        <div className="border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center gap-2">
+            <div className="flex items-center gap-1">
+                <Tooltip text={t('tooltips.moveUp')}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleMoveUp} disabled={index === 0}>
+                        <ArrowUp size={16} />
+                    </Button>
+                </Tooltip>
+                <Tooltip text={t('tooltips.moveDown')}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleMoveDown} disabled={index === totalExercises - 1}>
+                        <ArrowDown size={16} />
+                    </Button>
+                </Tooltip>
+            </div>
+            <div className="flex-grow" />
+            <Button variant="secondary" size="sm" onClick={() => setEditorOpen(true)}>
                 <Pencil size={14} className="mr-2" />
                 {t('actions.edit')}
             </Button>

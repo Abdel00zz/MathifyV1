@@ -20,8 +20,7 @@
     "addFromImage": "Add from image",
     "export": "Export",
     "noExercises": "This document is empty.",
-    "addFirstExercise": "Add your first exercise manually or from an image.",
-    "dragAndDrop": "Drag and drop to reorder exercises."
+    "addFirstExercise": "Add your first exercise manually or from an image."
   },
   "modals": {
     "newDocument": {
@@ -85,7 +84,7 @@
     "help": {
       "title": "Help & About",
       "editingTitle": "Editing Content",
-      "editingText": "You can edit document titles by clicking on them. Exercises can be modified using the 'Edit' button. To reorder exercises, simply drag and drop them using the handle on the left.",
+      "editingText": "You can edit document titles by clicking on them. Exercises can be modified using the 'Edit' button. To reorder exercises, use the up and down arrow buttons on each exercise card.",
       "syntaxTitle": "Content Syntax",
       "syntaxText": "The exercise content field accepts a mix of HTML for formatting and LaTeX for mathematical notation.",
       "inlineMath": "For inline formulas, wrap your LaTeX with \\(...\\). Example:",
@@ -136,6 +135,8 @@
   "tooltips": {
     "settings": "Settings",
     "help": "Help",
-    "actions": "Actions"
+    "actions": "Actions",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }

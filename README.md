@@ -11,7 +11,7 @@ Mathify is an innovative, responsive, and highly optimized web application desig
   - **Intelligent Language Detection**: The AI automatically detects the language in the image and generates all content in that same language, preventing unwanted translations.
   - **AI-Assisted Revision**: Opt-in to have the AI automatically revise spelling and vocabulary or bold key terms in the extracted content for professional-quality results.
 - **Advanced Exercise Editor**: Fine-tune extracted exercises or create new ones from scratch. Edit content with a live preview, set difficulty on a 5-star scale, and manage keywords.
-- **Drag-and-Drop Organization**: Easily reorder exercises within a document using a smooth drag-and-drop interface to create a logical pedagogical flow.
+- **Intuitive Exercise Reordering**: Effortlessly arrange exercises within a document using simple up/down arrow controls, ensuring a logical pedagogical flow.
 - **Professional Math Rendering**: Utilizes `better-react-mathjax` for crisp and accurate display of complex mathematical formulas.
 - **Customizable Export & Print**: 
     - **Realistic Live Preview**: A "paper on a desk" preview simulates the final A4 document, accurately rendering column flow and allowing scrolling through multi-page content for a true-to-print experience.

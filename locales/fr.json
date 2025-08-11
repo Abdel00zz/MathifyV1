@@ -20,8 +20,7 @@
     "addFromImage": "Ajouter depuis une image",
     "export": "Exporter",
     "noExercises": "Ce document est vide.",
-    "addFirstExercise": "Ajoutez votre premier exercice manuellement ou depuis une image.",
-    "dragAndDrop": "Glissez-déposez pour réorganiser les exercices."
+    "addFirstExercise": "Ajoutez votre premier exercice manuellement ou depuis une image."
   },
   "modals": {
     "newDocument": {
@@ -85,7 +84,7 @@
     "help": {
       "title": "Aide & À propos",
       "editingTitle": "Modifier le Contenu",
-      "editingText": "Vous pouvez modifier les titres des documents en cliquant dessus. Les exercices peuvent être modifiés via le bouton 'Modifier'. Pour réorganiser les exercices, glissez-déposez-les à l'aide de la poignée à gauche.",
+      "editingText": "Vous pouvez modifier les titres des documents en cliquant dessus. Les exercices peuvent être modifiés via le bouton 'Modifier'. Pour réorganiser les exercices, utilisez les flèches haut et bas sur chaque carte d'exercice.",
       "syntaxTitle": "Syntaxe du Contenu",
       "syntaxText": "Le champ de contenu des exercices accepte un mélange de HTML pour la mise en forme et de LaTeX pour les notations mathématiques.",
       "inlineMath": "Pour les formules en ligne, entourez votre code LaTeX avec \\(...\\). Exemple :",
@@ -136,6 +135,8 @@
   "tooltips": {
     "settings": "Paramètres",
     "help": "Aide",
-    "actions": "Actions"
+    "actions": "Actions",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas"
   }
 }
