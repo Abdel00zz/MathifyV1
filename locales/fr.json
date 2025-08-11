@@ -11,9 +11,7 @@
       "exercises": "exercices",
       "class": "Classe",
       "year": "Année",
-      "lastModified": "Modifié",
-      "saved": "Enregistré",
-      "unsaved": "Non enregistré"
+      "lastModified": "Modifié"
     }
   },
   "documentEditor": {
@@ -131,9 +129,9 @@
     "delete": "Supprimer",
     "close": "Fermer",
     "cancel": "Annuler",
-    "save": "Enregistrer",
     "open": "Ouvrir",
-    "export": "Exporter"
+    "export": "Exporter",
+    "exportJson": "Exporter JSON"
   },
   "tooltips": {
     "settings": "Paramètres",

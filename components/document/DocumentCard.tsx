@@ -9,7 +9,7 @@ import NewDocumentModal from '../modals/NewDocumentModal';
 import ExportModal from '../modals/ExportModal';
 import { useNavigate, Link } from 'react-router-dom';
 import Tooltip from '../ui/Tooltip';
-import { MoreVertical, Pencil, Copy, FileOutput, Trash2, CheckCircle2 } from 'lucide-react';
+import { MoreVertical, Pencil, Copy, FileOutput, Trash2, FileJson2 } from 'lucide-react';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 
 interface DocumentCardProps {
@@ -42,9 +42,23 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, isRecent = false 
     deleteDocument(document.id);
     setDeleteModalOpen(false);
   };
+
+  const handleExportJson = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const jsonString = JSON.stringify(document, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = window.document.createElement('a');
+    a.href = url;
+    a.download = `${document.title.replace(/\s+/g, '_')}.json`;
+    window.document.body.appendChild(a);
+    a.click();
+    window.document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setActionsOpen(false);
+  };
   
   const lastModified = document.lastModified ? new Date(document.lastModified) : new Date(document.date);
-  const isDirty = !document.lastSaved || (!!document.lastModified && document.lastModified > document.lastSaved);
 
   const handleAction = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation();
@@ -74,6 +88,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, isRecent = false 
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg z-10 border border-slate-200 dark:border-slate-800 p-2 space-y-1 animate-scale-in origin-top-right">
                   <DocumentCardAction onClick={(e) => handleAction(e, () => setEditModalOpen(true))} icon={<Pencil size={16} />} label={t('actions.edit')} />
                   <DocumentCardAction onClick={(e) => handleAction(e, () => duplicateDocument(document.id))} icon={<Copy size={16} />} label={t('actions.duplicate')} />
+                  <DocumentCardAction onClick={handleExportJson} icon={<FileJson2 size={16} />} label={t('actions.exportJson')} />
                   <DocumentCardAction onClick={(e) => handleAction(e, () => setExportModalOpen(true))} icon={<FileOutput size={16} />} label={t('actions.export')} />
                   <div className="my-1 h-px bg-slate-200 dark:bg-slate-700" />
                   <DocumentCardAction onClick={(e) => handleAction(e, () => setDeleteModalOpen(true))} icon={<Trash2 size={16} />} label={t('actions.delete')} className="text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400" />
@@ -89,23 +104,9 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, isRecent = false 
            <p className="text-slate-600 dark:text-slate-300 font-medium">
             {document.exercises.length} {t('dashboard.documentCard.exercises')}
           </p>
-           <div className="flex items-center gap-2 text-xs">
-             {isDirty ? (
-                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    <span>{t('dashboard.documentCard.unsaved')}</span>
-                </div>
-             ) : (
-                <div className="flex items-center gap-1.5 text-green-600 dark:text-green-500 font-semibold">
-                    <CheckCircle2 size={14} />
-                    <span>{t('dashboard.documentCard.saved')}</span>
-                </div>
-             )}
-            <span className="text-slate-400 dark:text-slate-500">&bull;</span>
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              {lastModified.toLocaleDateString(settings.language)}
-            </p>
-          </div>
+           <p className="text-xs text-slate-400 dark:text-slate-500">
+             {t('dashboard.documentCard.lastModified')} {lastModified.toLocaleDateString(settings.language)}
+           </p>
         </div>
       </div>
 

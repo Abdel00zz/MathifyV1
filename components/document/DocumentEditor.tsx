@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDocuments } from '../../hooks/useDocuments';
 import { useSettings } from '../../hooks/useSettings';
@@ -8,11 +8,11 @@ import Button from '../ui/Button';
 import ExportModal from '../modals/ExportModal';
 import ExerciseEditorModal from '../modals/ExerciseEditorModal';
 import ImageUploadModal from '../modals/ImageUploadModal';
-import { ChevronLeft, Plus, Image, Printer, Check, Edit, Save } from 'lucide-react';
+import { ChevronLeft, Plus, Image, Printer, Check, Edit } from 'lucide-react';
 
 const DocumentEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { documents, updateDocument, saveDocument } = useDocuments();
+  const { documents, updateDocument } = useDocuments();
   const { t } = useSettings();
   const [isExportOpen, setExportOpen] = useState(false);
   const [isAddExerciseOpen, setAddExerciseOpen] = useState(false);
@@ -22,17 +22,6 @@ const DocumentEditor: React.FC = () => {
   const document = documents.find(doc => doc.id === id);
   const [title, setTitle] = useState(document?.title || '');
   const titleInputRef = useRef<HTMLInputElement>(null);
-
-  const isDirty = useMemo(() => {
-    if (!document) return false;
-    return !document.lastSaved || (!!document.lastModified && document.lastModified > document.lastSaved);
-  }, [document]);
-
-  const handleSave = () => {
-    if (document && isDirty) {
-      saveDocument(document.id);
-    }
-  };
 
   useEffect(() => {
     if (document) {
@@ -90,14 +79,6 @@ const DocumentEditor: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <aside className="md:col-span-1 space-y-4 md:sticky md:top-24 h-fit bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <h2 className="text-lg font-semibold font-display border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Actions</h2>
-          {isDirty && (
-            <div className="animate-fade-in">
-              <Button variant="primary" onClick={handleSave} className="w-full justify-start mb-4">
-                  <Save size={16} className="mr-2"/>
-                  {t('actions.save')}
-              </Button>
-            </div>
-          )}
           <Button variant="secondary" onClick={() => setAddExerciseOpen(true)} className="w-full justify-start">
             <Plus size={16} className="mr-2"/>
             {t('documentEditor.addExercise')}

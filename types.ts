@@ -14,7 +14,6 @@ export interface Document {
   schoolYear: string;
   className: string;
   exercises: Exercise[];
-  lastSaved?: string;
   lastModified?: string;
 }
 

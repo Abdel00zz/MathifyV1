@@ -25,7 +25,6 @@ interface AppContextType {
   deleteExercise: (docId: string, exerciseId: string) => void;
   reorderExercises: (docId: string, startIndex: number, endIndex: number) => void;
   importDocuments: (importedDocs: Document[]) => void;
-  saveDocument: (docId: string) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -110,7 +109,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updateDocument = useCallback((docId: string, updates: Partial<Document>) => {
     setDocuments(prev =>
       prev.map(doc =>
-        doc.id === docId ? { ...doc, ...updates, lastModified: getCurrentTimestamp(), lastSaved: undefined } : doc
+        doc.id === docId ? { ...doc, ...updates, lastModified: getCurrentTimestamp() } : doc
       )
     );
   }, []);
@@ -131,7 +130,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             title: `${docToDuplicate.title} (Copy)`,
             date: new Date().toISOString().split('T')[0],
             lastModified: getCurrentTimestamp(),
-            lastSaved: undefined,
             exercises: docToDuplicate.exercises.map(ex => ({
                 ...ex,
                 id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
@@ -151,7 +149,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setDocuments(prev =>
       prev.map(doc =>
         doc.id === docId
-          ? { ...doc, exercises: [...doc.exercises, newExercise], lastModified: getCurrentTimestamp(), lastSaved: undefined }
+          ? { ...doc, exercises: [...doc.exercises, newExercise], lastModified: getCurrentTimestamp() }
           : doc
       )
     );
@@ -167,7 +165,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 ex.id === exerciseId ? { ...ex, ...updates } : ex
               ),
               lastModified: getCurrentTimestamp(),
-              lastSaved: undefined,
             }
           : doc
       )
@@ -178,7 +175,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setDocuments(prev =>
       prev.map(doc =>
         doc.id === docId
-          ? { ...doc, exercises: doc.exercises.filter(ex => ex.id !== exerciseId), lastModified: getCurrentTimestamp(), lastSaved: undefined }
+          ? { ...doc, exercises: doc.exercises.filter(ex => ex.id !== exerciseId), lastModified: getCurrentTimestamp() }
           : doc
       )
     );
@@ -192,7 +189,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const newExercises = Array.from(doc.exercises);
           const [removed] = newExercises.splice(startIndex, 1);
           newExercises.splice(endIndex, 0, removed);
-          return { ...doc, exercises: newExercises, lastModified: getCurrentTimestamp(), lastSaved: undefined };
+          return { ...doc, exercises: newExercises, lastModified: getCurrentTimestamp() };
         }
         return doc;
       })
@@ -227,21 +224,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   }, []);
 
-  const saveDocument = useCallback((docId: string) => {
-    setDocuments(prev =>
-      prev.map(doc => {
-        if (doc.id === docId) {
-          // Only show toast if there were actually unsaved changes
-          if (!doc.lastSaved || (doc.lastModified && doc.lastModified > doc.lastSaved)) {
-             toastContext?.addToast(`"${doc.title}" saved.`, 'success');
-          }
-          return { ...doc, lastSaved: doc.lastModified };
-        }
-        return doc;
-      })
-    );
-  }, [toastContext]);
-
   const value = {
     documents,
     settings,
@@ -260,7 +242,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     deleteExercise,
     reorderExercises,
     importDocuments,
-    saveDocument,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

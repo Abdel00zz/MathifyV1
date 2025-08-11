@@ -11,9 +11,7 @@
       "exercises": "exercises",
       "class": "Class",
       "year": "Year",
-      "lastModified": "Modified",
-      "saved": "Saved",
-      "unsaved": "Not saved"
+      "lastModified": "Modified"
     }
   },
   "documentEditor": {
@@ -131,9 +129,9 @@
     "delete": "Delete",
     "close": "Close",
     "cancel": "Cancel",
-    "save": "Save",
     "open": "Open",
-    "export": "Export"
+    "export": "Export",
+    "exportJson": "Export JSON"
   },
   "tooltips": {
     "settings": "Settings",

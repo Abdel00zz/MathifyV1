@@ -125,7 +125,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             onChange={handleChange}
             placeholder={t('modals.settings.geminiApiKeyPlaceholder')}
           />
-          <div className="flex items-center justify-between h-8">
+          <div className="flex items-center justify-end gap-4 min-h-[36px]">
             <VerificationStatusIndicator status={verificationStatus} t={t} />
             <Button variant="secondary" size="sm" onClick={handleVerify} isLoading={verificationStatus === 'verifying'}>
               {t('modals.settings.verifyConnection')}

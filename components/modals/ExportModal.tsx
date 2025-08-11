@@ -75,46 +75,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, document }) 
   }, []);
 
   const handlePrint = useCallback(() => {
-    setIsPrinting(true);
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(generatedHtml);
-      printWindow.document.close();
-      
-      const onPrintFinish = () => {
-        setIsPrinting(false);
-        try { printWindow.close(); } catch (e) { console.warn("Could not close print window", e); }
-      };
+    const iframe = iframeRef.current;
+    if (iframe && iframe.contentWindow) {
+        setIsPrinting(true);
+        const printIframeWindow = iframe.contentWindow;
 
-      const checkMathJax = () => {
-        const mathJax = (printWindow.window as any).MathJax;
-        if (mathJax && mathJax.startup?.promise) {
-          mathJax.startup.promise.then(() => {
-            setTimeout(() => {
-              printWindow.focus();
-              printWindow.print();
-              onPrintFinish();
-            }, 500);
-          });
-        } else {
-           setTimeout(() => {
-              printWindow.focus();
-              printWindow.print();
-              onPrintFinish();
-            }, 1500);
-        }
-      };
-      
-      if (printWindow.document.readyState === 'complete') {
-        checkMathJax();
-      } else {
-        printWindow.onload = checkMathJax;
-      }
+        const handleAfterPrint = () => {
+            setIsPrinting(false);
+            printIframeWindow.removeEventListener('afterprint', handleAfterPrint);
+        };
+
+        printIframeWindow.addEventListener('afterprint', handleAfterPrint);
+        
+        // A brief timeout can help ensure scripts and styles are fully applied before printing, especially on mobile.
+        setTimeout(() => {
+            printIframeWindow.focus();
+            printIframeWindow.print();
+        }, 100);
+
     } else {
-      setIsPrinting(false);
-      addToast("Could not open print window. Check your browser's popup blocker.", 'error');
+        addToast("Could not print the document preview.", 'error');
     }
-  }, [generatedHtml, addToast]);
+  }, [addToast]);
 
   const handleDownload = useCallback(() => {
     const blob = new Blob([generatedHtml], { type: 'text/html' });
