@@ -1,0 +1,245 @@
+import React, { createContext, useState, useEffect, useCallback, ReactNode, useContext } from 'react';
+import { AppSettings, Document, Exercise } from '../types';
+import { DOCS_STORAGE_KEY, SETTINGS_STORAGE_KEY } from '../constants';
+import { useMobile } from '../hooks/useMobile';
+import { useI18n } from '../hooks/useI18n';
+import { ToastContext } from './ToastContext';
+
+interface AppContextType {
+  documents: Document[];
+  settings: AppSettings;
+  isMobile: boolean;
+  recentlyDuplicatedId: string | null;
+  t: (key: string, replacements?: Record<string, string | number>) => string;
+  updateSettings: (newSettings: Partial<AppSettings>) => void;
+  addDocument: (doc: Omit<Document, 'id' | 'exercises' | 'date'>) => Document;
+  updateDocument: (docId: string, updates: Partial<Document>) => void;
+  deleteDocument: (docId: string) => void;
+  duplicateDocument: (docId: string) => void;
+  addExercise: (docId: string, exercise: Omit<Exercise, 'id'>) => void;
+  updateExercise: (docId: string, exerciseId: string, updates: Partial<Exercise>) => void;
+  deleteExercise: (docId: string, exerciseId: string) => void;
+  reorderExercises: (docId: string, startIndex: number, endIndex: number) => void;
+  importDocuments: (importedDocs: Document[]) => void;
+  saveDocument: (docId: string) => void;
+}
+
+export const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const getInitialState = <T,>(key: string, fallback: T): T => {
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (error) {
+    console.error(`Error reading from localStorage key "${key}":`, error);
+    return fallback;
+  }
+};
+
+export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const toastContext = useContext(ToastContext);
+
+  const defaultSettings: AppSettings = {
+    language: 'en',
+    theme: 'system',
+    teacherName: '',
+    schoolId: '',
+  };
+
+  const [documents, setDocuments] = useState<Document[]>(() => getInitialState<Document[]>(DOCS_STORAGE_KEY, []));
+  const [settings, setSettings] = useState<AppSettings>(() => getInitialState<AppSettings>(SETTINGS_STORAGE_KEY, defaultSettings));
+  const [recentlyDuplicatedId, setRecentlyDuplicatedId] = useState<string | null>(null);
+
+  const isMobile = useMobile();
+  const { t } = useI18n(settings.language);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(DOCS_STORAGE_KEY, JSON.stringify(documents));
+    } catch (error) {
+      console.error("Error saving documents to localStorage:", error);
+    }
+  }, [documents]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    } catch (error) {
+      console.error("Error saving settings to localStorage:", error);
+    }
+  }, [settings]);
+
+  const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
+
+  const getCurrentTimestamp = () => new Date().toISOString();
+
+  const addDocument = useCallback((doc: Omit<Document, 'id' | 'exercises' | 'date'>): Document => {
+    const newDoc: Document = {
+      ...doc,
+      id: `doc_${Date.now()}`,
+      exercises: [],
+      date: new Date().toISOString().split('T')[0],
+      lastModified: getCurrentTimestamp(),
+    };
+    setDocuments(prev => [newDoc, ...prev]);
+    return newDoc;
+  }, []);
+
+  const updateDocument = useCallback((docId: string, updates: Partial<Document>) => {
+    setDocuments(prev =>
+      prev.map(doc =>
+        doc.id === docId ? { ...doc, ...updates, lastModified: getCurrentTimestamp(), lastSaved: undefined } : doc
+      )
+    );
+  }, []);
+
+  const deleteDocument = useCallback((docId: string) => {
+    const docTitle = documents.find(d => d.id === docId)?.title || 'Document';
+    setDocuments(prev => prev.filter(doc => doc.id !== docId));
+    toastContext?.addToast(`"${docTitle}" deleted.`, 'success');
+  }, [documents, toastContext]);
+  
+  const duplicateDocument = useCallback((docId: string) => {
+    const docToDuplicate = documents.find(d => d.id === docId);
+    if (docToDuplicate) {
+        const newDocId = `doc_${Date.now()}`;
+        const newDoc: Document = {
+            ...docToDuplicate,
+            id: newDocId,
+            title: `${docToDuplicate.title} (Copy)`,
+            date: new Date().toISOString().split('T')[0],
+            lastModified: getCurrentTimestamp(),
+            lastSaved: undefined,
+            exercises: docToDuplicate.exercises.map(ex => ({
+                ...ex,
+                id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+            }))
+        };
+        setDocuments(prev => [newDoc, ...prev]);
+        setRecentlyDuplicatedId(newDocId);
+        setTimeout(() => setRecentlyDuplicatedId(null), 1000);
+    }
+  }, [documents]);
+
+  const addExercise = useCallback((docId: string, exercise: Omit<Exercise, 'id'>) => {
+    const newExercise: Exercise = {
+      ...exercise,
+      id: `ex_${Date.now()}`,
+    };
+    setDocuments(prev =>
+      prev.map(doc =>
+        doc.id === docId
+          ? { ...doc, exercises: [...doc.exercises, newExercise], lastModified: getCurrentTimestamp(), lastSaved: undefined }
+          : doc
+      )
+    );
+  }, []);
+
+  const updateExercise = useCallback((docId: string, exerciseId: string, updates: Partial<Exercise>) => {
+    setDocuments(prev =>
+      prev.map(doc =>
+        doc.id === docId
+          ? {
+              ...doc,
+              exercises: doc.exercises.map(ex =>
+                ex.id === exerciseId ? { ...ex, ...updates } : ex
+              ),
+              lastModified: getCurrentTimestamp(),
+              lastSaved: undefined,
+            }
+          : doc
+      )
+    );
+  }, []);
+
+  const deleteExercise = useCallback((docId: string, exerciseId: string) => {
+    setDocuments(prev =>
+      prev.map(doc =>
+        doc.id === docId
+          ? { ...doc, exercises: doc.exercises.filter(ex => ex.id !== exerciseId), lastModified: getCurrentTimestamp(), lastSaved: undefined }
+          : doc
+      )
+    );
+    toastContext?.addToast('Exercise deleted.', 'success');
+  }, [toastContext]);
+
+  const reorderExercises = useCallback((docId: string, startIndex: number, endIndex: number) => {
+    setDocuments(prev =>
+      prev.map(doc => {
+        if (doc.id === docId) {
+          const newExercises = Array.from(doc.exercises);
+          const [removed] = newExercises.splice(startIndex, 1);
+          newExercises.splice(endIndex, 0, removed);
+          return { ...doc, exercises: newExercises, lastModified: getCurrentTimestamp(), lastSaved: undefined };
+        }
+        return doc;
+      })
+    );
+  }, []);
+  
+  const importDocuments = useCallback((importedDocs: Document[]) => {
+    const validDocs = importedDocs.filter(d => d.id && d.title && Array.isArray(d.exercises));
+    
+    setDocuments(prevDocs => {
+      const importedDocsMap = new Map(validDocs.map(d => [d.id, d]));
+      const existingIds = new Set(prevDocs.map(d => d.id));
+
+      const updatedDocs = prevDocs.map(existingDoc => {
+        if (importedDocsMap.has(existingDoc.id)) {
+          const importedDoc = importedDocsMap.get(existingDoc.id)!;
+          const existingExerciseIds = new Set(existingDoc.exercises.map(ex => ex.id));
+          const newExercises = importedDoc.exercises.filter(ex => !existingExerciseIds.has(ex.id));
+          return {
+            ...existingDoc,
+            ...importedDoc,
+            exercises: [...existingDoc.exercises, ...newExercises],
+            lastModified: getCurrentTimestamp(),
+          };
+        }
+        return existingDoc;
+      });
+
+      const newDocs = validDocs.filter(d => !existingIds.has(d.id));
+      
+      return [...updatedDocs, ...newDocs];
+    });
+  }, []);
+
+  const saveDocument = useCallback((docId: string) => {
+    setDocuments(prev =>
+      prev.map(doc => {
+        if (doc.id === docId) {
+          // Only show toast if there were actually unsaved changes
+          if (!doc.lastSaved || (doc.lastModified && doc.lastModified > doc.lastSaved)) {
+             toastContext?.addToast(`"${doc.title}" saved.`, 'success');
+          }
+          return { ...doc, lastSaved: doc.lastModified };
+        }
+        return doc;
+      })
+    );
+  }, [toastContext]);
+
+  const value = {
+    documents,
+    settings,
+    isMobile,
+    t,
+    recentlyDuplicatedId,
+    updateSettings,
+    addDocument,
+    updateDocument,
+    deleteDocument,
+    duplicateDocument,
+    addExercise,
+    updateExercise,
+    deleteExercise,
+    reorderExercises,
+    importDocuments,
+    saveDocument,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};

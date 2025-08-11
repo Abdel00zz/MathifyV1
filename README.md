@@ -1,0 +1,102 @@
+# Mathify - AI-Powered Math Document Editor
+
+Mathify is an innovative, responsive, and highly optimized web application designed for mathematics teachers and students. It streamlines the creation, organization, and sharing of structured mathematical documents by leveraging the power of Google's Gemini AI. The AI analyzes images of math exercises, intelligently detects their language, and automatically extracts content, hierarchical structure, and LaTeX-formatted formulas, preserving the original context without translation.
+
+## ✨ Key Features
+
+- **Modern UI/UX**: A clean, modern, and professional user interface featuring refined typography (**Fira Sans** for body text and **Roboto Slab** for headings), a sophisticated **slate** color palette, and a new `FunctionSquare` logo for a distinct brand identity. The UI is designed for a delightful user experience.
+- **Intelligent Document Management**: Create, edit, duplicate, and delete documents with ease. The app provides clear visual indicators for **saved vs. unsaved** changes, giving users confidence in their workflow. All data is persisted in the browser's local storage.
+- **AI-Powered Exercise Creation**: 
+  - **Multimodal Analysis**: Upload images of math exercises, and let Gemini automatically extract the title, difficulty, keywords, and structured content in HTML with perfect LaTeX.
+  - **Intelligent Language Detection**: The AI automatically detects the language in the image and generates all content in that same language, preventing unwanted translations.
+  - **AI-Assisted Revision**: Opt-in to have the AI automatically revise spelling and vocabulary or bold key terms in the extracted content for professional-quality results.
+- **Advanced Exercise Editor**: Fine-tune extracted exercises or create new ones from scratch. Edit content with a live preview, set difficulty on a 5-star scale, and manage keywords.
+- **Drag-and-Drop Organization**: Easily reorder exercises within a document using a smooth drag-and-drop interface to create a logical pedagogical flow.
+- **Professional Math Rendering**: Utilizes `better-react-mathjax` for crisp and accurate display of complex mathematical formulas.
+- **Customizable Export & Print**: 
+    - **Realistic Live Preview**: A "paper on a desk" preview simulates the final A4 document, accurately rendering column flow and allowing scrolling through multi-page content for a true-to-print experience.
+    - **Advanced Options**: Customize layout (single or dual-column with proper content flow), font size, print theme (Default, Ink Saver, High Contrast), and content visibility (e.g., toggle AI-generated titles while keeping exercise numbers).
+    - **Multiple Formats**: Print directly or download as a self-contained HTML file.
+- **Multi-Image Processing Queue**: A modern interface for handling multiple image uploads simultaneously, with individual status tracking (waiting, analyzing, success, error) for each file.
+- **Internationalization (i18n)**: Full support for English and French, with a modular structure that makes adding new languages simple.
+- **Fully Responsive Design**: A seamless experience across desktops, tablets, and smartphones, optimized with custom hooks like `useMobile`.
+- **Accessible UI**: Includes features like focus trapping in modals and proper ARIA attributes for improved keyboard navigation and screen reader support.
+
+## 🛠️ Technology Stack
+
+- **Frontend**: [React 19](https://react.dev/) (with Hooks), [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) for a utility-first CSS workflow.
+- **Math Rendering**: [better-react-mathjax](https://github.com/fast-reflexes/better-react-mathjax) for optimal MathJax integration in React.
+- **AI**: [Google Gemini API](https://ai.google.dev/) (`@google/genai`) for multimodal content analysis.
+- **Routing**: [React Router](https://reactrouter.com/) for client-side navigation.
+- **Icons**: [Lucide React](https://lucide.dev/) for a clean and modern icon set.
+- **File Uploads**: [React Dropzone](https://react-dropzone.js.org/) for powerful drag-and-drop functionality.
+
+## 🏗️ Project Architecture
+
+The project is structured to be modular, scalable, and maintainable.
+
+- **/src/components**: Contains all React components, organized by feature (`document`, `exercise`, `modals`) and reusability (`ui`, `layout`).
+  - **/ui**: Generic, reusable components like `Button`, `Modal`, `Input`, and `Checkbox`.
+  - **/layout**: Structural components like `Header`.
+- **/src/contexts**: `AppContext` and `ToastContext` provide global state management, avoiding prop drilling.
+- **/src/hooks**: Custom hooks encapsulate reusable logic.
+  - `useDocuments`: Manages all CRUD operations for documents and exercises.
+  - `useSettings`: Manages user settings and preferences.
+  - `useI18n`: Handles language loading and provides the translation function.
+  - `useMobile`: Detects if the user is on a mobile device for responsive UI adjustments.
+  - `useFocusTrap`: Ensures keyboard focus is contained within modals for accessibility.
+- **/src/services**: Isolates external communications and complex logic.
+  - `geminiService.ts`: Handles all interactions with the Google Gemini API, including dynamic prompt construction.
+  - `htmlGenerator.ts`: Creates the self-contained HTML for document exports, complete with themes and column support.
+- **/src/types**: Defines all core TypeScript types and interfaces (`Document`, `Exercise`, etc.).
+- **/src/locales**: Stores JSON files for internationalization.
+- **/src/constants.ts**: Shared constants, such as `localStorage` keys.
+
+### Core Logic Explained
+
+- **State Management**: The application uses React Context (`AppContext`) for centralized state management. Changes to documents are tracked automatically, with clear UI indicators for unsaved work. Users can explicitly save their progress. All documents and settings are loaded from `localStorage` on startup and are persisted back when changes are saved, ensuring data integrity between sessions.
+- **AI Integration**: When a user uploads an image, it is converted to a base64 string and sent to the `geminiService`. A sophisticated system instruction is dynamically built based on user-selected options (e.g., "revise text"). This prompt, along with a strict JSON schema, instructs the Gemini model to analyze the image, detect its language, and return structured data (title, difficulty, keywords, and HTML/LaTeX content) in the *source language*, which is then used to create a new exercise.
+- **Math Rendering**: `MathJaxContext` is configured in `index.tsx` to define global settings for LaTeX parsing. The custom `MathRenderer` component takes a string of HTML with embedded LaTeX and uses `better-react-mathjax` to correctly typeset the mathematical formulas. A key prop tied to the content ensures that the component re-renders and re-typesets correctly when the content changes dynamically.
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- A modern web browser (Chrome, Firefox, Safari, Edge).
+- A **Google Gemini API Key**. You can obtain one from [Google AI Studio](https://makersuite.google.com/app/apikey).
+
+### Configuration
+
+The application requires a Google Gemini API key to function. This key must be provided as an environment variable.
+
+1.  This application is designed to be run in an environment where the `API_KEY` is securely managed. For local development, create a `.env` file in the root of your project.
+2.  Add your Gemini API Key to the `.env` file like this:
+    ```
+    API_KEY=YOUR_GEMINI_API_KEY
+    ```
+    Replace `YOUR_GEMINI_API_KEY` with your actual key. The application is configured to automatically use this variable.
+
+### Running the Application
+
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Run in Development Mode**:
+    ```bash
+    npm run dev
+    ```
+    This will start the development server with hot-reloading.
+
+3.  **Build for Production**:
+    ```bash
+    npm run build
+    ```
+    This will create an optimized `dist` folder ready for deployment.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+#   M a t h i f y V 1  
+ 
